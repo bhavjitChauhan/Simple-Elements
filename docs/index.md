@@ -121,10 +121,10 @@ var config = {
   <dd>Object that hold the minimum, maximum and fill color values. The minimum and maximum values refer to the size of the shadow when neutral and hovered respectively. Note that the fill color is not displayed accurately because when the shadow is drawn, it will be much darker as it is applied multiple times to achieve the blur effect.</dd>
   
   <dt>Gradient</dt>
-  <dd>Object that hold the start and stop color as well as the size value. The start and stop color values represent what color the gradient will start, from the top to the bottom. The size value determines how for down the gradient goes.</dd>
+  <dd>Object that hold the start and stop color as well as the size value. The start and stop color values represent what color the gradient will start, from the top to the bottom. The size value determines how far down the gradient goes.</dd>
 </dl>
 
-The rest of the `config` object's sections are separate for every element. This was done to not end up with unneeded values if a certain elements is not utilized in a program.
+The rest of the `config` object's sections are separate for every element. This was done to not end up with unneeded values if certain elements are not utilized in a program.
 
 Individual `config` objects for every element are usually not required. If a certain element's `config` is not defined, though, the parameters that would have been in the config must all be passed into the element. The format for a `config` for each element is as shown below.
 ```javascript
@@ -145,7 +145,7 @@ Elements are all object oriented and a new instance must be created for any elem
 var button1 = new Button();
 ```
 
-## Prameters
+## Parameters
 Parameters are passed into the elements in a single object.
 ```javascript
 var button1 = new Button({
@@ -189,7 +189,7 @@ elements.forEach(function (element) {
 Each element needs to be set up in a different way. All elements and their specific parameters and usage are below.
 
 ### Button
-A simple button element that excecutes a function when clicked. Below is the button's default config.
+A simple button element that executes a function when clicked. Below is the button's default config.
 ```javascript
 config.button = {
     w: 75,
@@ -200,7 +200,7 @@ config.button = {
 The `Button` element has no unique parameters or methods.
 
 ### Slider
-A simple slider that excecutes a function when the thumb is dragged or when certain keys are pressed. Below is the slider's default config.
+A simple slider that executes a function when the thumb is dragged or when certain keys are pressed. Below is the slider's default config.
 ```javascript
 config.slider = {
     w: 100,
@@ -209,7 +209,7 @@ config.slider = {
     max: 100
 };
 ```
-The `Slider` element takes some unique parameters to set it's value range and default value.
+The `Slider` element takes some unique parameters to set its value range and default value.
 
 Parameter | Definition
 --- | ---
