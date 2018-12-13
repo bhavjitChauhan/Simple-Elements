@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Simple Elements Docs</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prism-themes@1.0.1/themes/prism-vs.css">
+    <style>
+        pre {
+            overflow: auto;
+            overflow-y: scroll;
+            max-height: 500px;
+            border-radius: 5px;
+        }
+        table code,
+        dt code {
+            color: #000000;
+        }
+        li a.active {
+            background-color: white !important;
+            color: #007bff !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 7.5px;
+            height: 7.5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body data-spy="scroll" data-target="#navbar-main" data-offset="0">
+    <nav id="navbar-main" class="navbar sticky-top navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Simple Elements Docs</a>
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="#about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="#usage">Usage</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" data-toggle="dropdown" href="#" role="button"
+                        aria-haspopup="true" aria-expanded="false">Elements</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#elements">Base Element</a>
+                        <div role="separator" class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#button">Button</a>
+                        <a class="dropdown-item" href="#slider">Slider</a>
+                        <a class="dropdown-item" href="#checkbox">Checkbox</a>
+                        <a class="dropdown-item" href="#radio-button">Radio Button</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container main">
+        <br>
+        <h2 id="about">About</h2>
+        <hr>
+        <p>This GUI library was made to be simple and easy to use. It doesn't offer a huge selection of
+            elements as of
+            now, but the number will increase in the future.</p>
+        <p>A demo of the GUI elements can be seen <a href="https://www.khanacademy.org/computer-programming/simple-elements/5201788906799104"
+                target="_blank">here</a>.</p>
+
+        <h4>Credits</h4>
+        <ul class="list-unstyled">
+            <li>KWC (<a href="https://www.khanacademy.org/profile/MKaelin368/" target="_blank">@MKaelin368</a>)</li>
+            <ul>
+                <li>Provided the <code>inherit</code> function</li>
+                <li>Suggested a better way of defining methods</li>
+                <li>Suggested to store all elements in an array and iterate over each element to deliver the event</li>
+                <li>Suggested to use a <code>virtual</code> <code>noop</code> function in case a method that is not
+                    defined is invoked</li>
+            </ul>
+            <li>Vision (<a href="https://stackoverflow.com/a/14879700" target="_blank">@VisioN</a>)</li>
+            <ul>
+                <li>Efficient way of finding the number of digits in a number</li>
+            </ul>
+        </ul>
+        <h4>Inspiration</h4>
+        <ul>
+            <li><a href="https://www.khanacademy.org/computer-programming/graphical-user-interface-elements/4582505184231424"
+                    target="_blank">Graphical User Interface Elements</a> by <a href="https://www.khanacademy.org/profile/Dalendrion/"
+                    target="_blank">Dalendrion</a></li>
+            <li><a href="https://www.khanacademy.org/computer-programming/ui/2181435578" target="_blank">UI</a> by <a
+                    href="https://www.khanacademy.org/profile/humbleservant/" target="_blank">&#26408;</a></li>
+            <li><a href="https://www.khanacademy.org/computer-programming/gui/4904971019485184" target="_blank">GUI</a>
+                by <a href="https://www.khanacademy.org/profile/voidx/" target="_blank">Thomas L</a></li>
+            <li><a href="https://www.khanacademy.org/profile/peterwcollingridge/" target="_blank">Peter Collingridge</a>'s
+                projects</li>
+            <li>MacOS Mojave and Material Design</li>
+        </ul>
+        <br>
+        <h2 id="usage">Usage</h2>
+        <hr>
+        <p>Before the elements can be used, they require a bit of a set up process. This includes the event handling,
+            configuration and some special functions.</p>
+        <p>The elements will not work properly without these componenets.</p>
+        <br>
+        <h4 id="event-handling">Event handling</h4>
+        <hr>
+        <p>Event handling is done by storing all elements in an array and iterating over the array to invoke each
+            method of the elements.</p>
+        <pre><code class="language-js">var elements = [button1, slider1];
+            
+mouseReleased = function() {
+    elements.forEach(function (element) {
+        element.onmouserelease();
+    });
+};</code></pre>
+        <p>If there are multiple pages in a program, it is recommended that elements be stored in separatearrays for
+            each of the pages. This eliminates the possibility of invoking elements from separatepages.</p>
+        <pre><code class="language-js">var page1 = [button1, slider1];
+var page2 = [slider2];
+
+mouseReleased = function() {
+    switch(page) {
+        case "page1":
+            page1.forEach(function (element) {
+                element.onmouserelease();
+            });
+            break;
+        case "page2":
+            page2.forEach(function (element) {
+                element.onmouserelease();
+            });
+            break;
+    }
+};</code></pre>
+        <br>
+        <p>Below are all the event methods and their corresponding Processing function.</p>
+        <table class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Event</th>
+                    <th scope="col">Processing Function</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>onmousepress</code></td>
+                    <td><code>mousePressed</code></td>
+
+                </tr>
+                <tr>
+                    <td><code>onmouserelease</code></td>
+                    <td><code>mouseReleased</code></td>
+
+                </tr>
+                <tr>
+                    <td><code>onmousedrag</code></td>
+                    <td><code>mouseDragged</code></td>
+                </tr>
+                <tr>
+                    <td><code>onkeypress</code></td>
+                    <td><code>keyPressed</code></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <h4 id="config">Configuration</h4>
+        <hr>
+        <p>Almost all fall back parameters are stored induvidually for each element in a <code>config</code> object.
+            The object also includes global settings that are used by all elements.</p>
+        <p>It's not recommended to remove any values from the <code>config</code> object as most of them are needed and
+            the elements will break if they are not defined. There are, however, some that can be given directly to the
+            elements when creating them. Parameters given to the elements will almost always overwrite the config
+            values.</p>
+        <h6>This is the first section of the <code>config</code> object.</h6>
+        <pre><code class="language-js">var config = {
+    audioFeedback: null,
+    animationStep: 0.2,
+    font: createFont("sans-serif", 16),
+    strokeWeight: 1,
+    symbolWeight: 3,
+    fill: {
+        accent: color(0, 111, 222),
+        outline: color(150),
+        background: color(240),
+        disabled: color(175),
+        gradient: true
+    },
+    shadow: {
+        min: 25,
+        max: 27.5,
+        fill: color(0, 0, 0, 2.5)
+    },
+    gradient: {
+        startColor: color(255, 255, 255, 50),
+        stopColor: color(255, 255, 255, 0),
+        size: 25
+    }
+};</code></pre>
+        <dl class="row">
+            <dt class="col-sm-3"><code>audioFeedback</code></dt>
+            <dd class="col-sm-9">Stores sound that will be played when the mouse is released on an element. Should be
+                set to <code>getSound("sound")</code>. Leave as <code>null</code> for no audio feedback.</dd>
+
+            <dt class="col-sm-3"><code>animationStep</code>*</dt>
+            <dd class="col-sm-9">Amount the transition will increase or decrease by for hover and click animations.
+                Note that hover out animation will be twice as fast.</dd>
+
+            <dt class="col-sm-3"><code>font</code>*</dt>
+            <dd class="col-sm-9">The font to be used by the elements. It's recommended to not drastically change the
+                size as it might mess up the elements' appearances.</dd>
+
+            <dt class="col-sm-3"><code>strokeWeight</code></dt>
+            <dd class="col-sm-9">The stroke weight used for various parts for elements. Note that fine lines will be
+                half the stroke weight.</dd>
+
+            <dt class="col-sm-3"><code>symbolWeight</code></dt>
+            <dd class="col-sm-9">The stroke weight used for all symbols for the elements.</dd>
+
+            <dt class="col-sm-3"><code>fill</code>*</dt>
+            <dd class="col-sm-9">
+                <dl class="row">
+                    <dt class="col-sm-4"><code>accent</code>*</dt>
+                    <dd class="col-sm-8">Primary color used in all elements.</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4"><code>outline</code>*</dt>
+                    <dd class="col-sm-8">Color used for outlines of elements or elements' parts.</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4"><code>background</code>*</dt>
+                    <dd class="col-sm-8">Used for background of some elements.</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4"><code>disabled</code>*</dt>
+                    <dd class="col-sm-8">Primary color used when elements are disabled.</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4"><code>gradient</code></dt>
+                    <dd class="col-sm-8">Boolean for gradient. Note, this does not affect color of the gradient.</dd>
+                </dl>
+            </dd>
+
+            <dt class="col-sm-3"><code>shadow</code>*</dt>
+            <dd class="col-sm-9">
+                <dl class="row">
+                    <dt class="col-sm-4"><code>min</code>*</dt>
+                    <dd class="col-sm-8">The size of the shadow when in the normal state.</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4"><code>max</code>*</dt>
+                    <dd class="col-sm-8">The size of the shadow when element is hovered over.</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4"><code>fill</code>*</dt>
+                    <dd class="col-sm-8">Color used for the shadow. Note that the color is not exactly what will show
+                        when the shadow is drawn, it will be much darker as it is applied multiple times to achieve the
+                        blur effect.</dd>
+                </dl>
+            </dd>
+
+            <dt class="col-sm-3"><code>gradient</code></dt>
+            <dd class="col-sm-9">
+                <dl class="row">
+                    <dt class="col-sm-4"><code>startColor</code></dt>
+                    <dd class="col-sm-8">Color overlayed on top of element at the top.</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4"><code>stopColor</code></dt>
+                    <dd class="col-sm-8">Color that will be transitioned to from the <code>startColor</code>. Note that
+                        this color should ideally be transparent.</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-4"><code>size</code></dt>
+                    <dd class="col-sm-8">Amount of space for the transition to occur.</dd>
+                </dl>
+            </dd>
+        </dl>
+        <p>The rest of the <code>config</code> object's sections are seperate for every element. This is to not have
+            unneeded values if a certain element is not utilized in a program.</p>
+        <p>Induvidual <code>config</code> objects for ever element are usually not required. If a certain element's
+            <code>config</code> is not defined, though, the parameters that would have been in the <code>config</code>
+            must all be passed into the element. The format for A <code>config</code> for each element is as shown
+            below.</p>
+        <pre><code class="language-js">config.element = {
+    prop1: value1,
+    prop2: value2
+};</code></pre>
+        <br>
+        <h4 id="config">Secial Functions</h4>
+        <hr>
+        <p>Some stand-alone are needed to further increase the functionality of vanilla Javascript functions. The <code>toTitleCase</code>
+            prototype function for the <code>String</code> object converts text to title case, it's used everywhere
+            text is displayed in elements except the <code>Textbox</code> input area. The <code>except</code> prototype
+            function for the <code>Array</code> object return the array except a certain value. The <code>inherit</code>
+            function is used to add the <code>Element</code> methods to elements.</p>
+        <p>Special functions also include the <code>Symbols</code> object which stores all the symbols that will be
+            used in some elements such as the checkmark and arrow. The base <code>Element</code> class is the parent
+            class for every element and provides most of the basic functionality.</p>
+        <br>
+        <h2 id="elements">Elements</h2>
+        <hr>
+        <p>Elements are all object oriented and a new instance must be created for any element class to be used.</p>
+        <pre><code class="language-js">var button1 = new Button();</code></pre>
+        <br>
+        <h5>Parameters</h5>
+        <p>Parameters are passed into the elements in a single object.</p>
+        <pre><code class="language-js">var button1 = new Button({
+    x: 100,
+    y: 150
+});</code></pre>
+        <p>Parameters not passed to into the element will fall back to the <code>config</code> object or a hard-coded
+            value.</p>
+        <p>Every element inherits generic parameters from the <code>Element</code> class. Although some parameters
+            can't be changed for certain elements most of these parameters are the same in every element and do the
+            same thing, unless otherwise stated.</p>
+        <dl class="row">
+            <dt class="col-sm-3"><code>x</code></dt>
+            <dd class="col-sm-9">The <code>x</code> position of the element.</dd>
+            <dt class="col-sm-3"><code>y</code></dt>
+            <dd class="col-sm-9">The <code>y</code> position of the element.</dd>
+            <dt class="col-sm-3"><code>w</code></dt>
+            <dd class="col-sm-9">The width of the element.</dd>
+            <dt class="col-sm-3"><code>h</code></dt>
+            <dd class="col-sm-9">The width of the element.</dd>
+            <dt class="col-sm-3"><code>label</code></dt>
+            <dd class="col-sm-9">The label for the element, usually shown above or inside the element.</dd>
+            <dt class="col-sm-3"><code>action</code></dt>
+            <dd class="col-sm-9">A function that will be called if the element is pressed.</dd>
+            <dt class="col-sm-3"><code>r</code></dt>
+            <dd class="col-sm-9">The border radius of a rectangle if the element's shape is a rectangle, if the shape
+                of the element is an ellipse, this parameter will be the radius of the ellipse.</dd>
+            <dt class="col-sm-3"><code>fill</code></dt>
+            <dd class="col-sm-9">The color of the element.</dd>
+            <dt class="col-sm-3"><code>disabled</code></dt>
+            <dd class="col-sm-9">Boolean value that will determine if the element is disabled or not. Cannot be changed
+                after element creation, the <code>disable</code> and <code>enable</code> methods need to be used for
+                that.</dd>
+        </dl>
+        <br>
+        <h5>Methods</h5>
+        <p>Every element inherits some essential methods from the <code>Element</code> class.</p>
+        <dl class="row">
+            <dt class="col-sm-3"><code>init</code></dt>
+            <dd class="col-sm-9">Initiates the element, if any values like the <code>x</code> or <code>w</code>
+                positions were changed the changes will be updated.</dd>
+            <dt class="col-sm-3"><code>disable</code></dt>
+            <dd class="col-sm-9">Disables the element if previously enabled.</dd>
+            <dt class="col-sm-3"><code>enable</code></dt>
+            <dd class="col-sm-9">Enables the element if previously disabled.</dd>
+        </dl>
+        <br>
+        <h5>Drawing Elements</h5>
+        <p>Elements will not appear on the screen until their <code>draw</code> method is called. It is recommended to
+            store elements in an array and iterate over the array to draw the elements if there are several elements to
+            be displayed as shown below.</p>
+        <pre><code class="language-js">var elements = [button1, button2, slider1, textbox1];
+elements.forEach(function (element) {
+    element.draw();
+});</code></pre>
+        <br>
+        <p>Each element needs to be set up in a different way. Below is a list of the elements, what properties they
+            have and their code.</p>
+        <h4 id="button">Button</h4>
+        <hr>
+        <p>A simple button element that excecutes a function when clicked.</p>
+        <p>The button's default config</p>
+        <pre><code class="language-js">config.button = {
+    w: 75,
+    h: 30,
+    r: 5
+};</code></pre>
+        <br>
+        <p>The <code>Button</code> element has no unique parameters other than the <code>action</code>
+            parameter.</p>
+        <dl class="row">
+            <dt class="col-sm-3"><code>action</code></dt>
+            <dd class="col-sm-9">A function that will be excecuted once the button is pressed.</dd>
+        </dl>
+        <br>
+        <h4 id="slider">Slider</h4>
+        <p>A simple slider that excecutes a function when the thumb is dragged or when certain keys are
+            pressed.</p>
+        <p>The default slider config</p>
+        <pre><code class="language-js">config.slider = {
+    w: 100,
+    r: 10,
+    min: 0,
+    max: 100
+};</code></pre>
+        <br>
+        <p>The <code>Slider</code> element takes some unique parameters to set it's value range and default
+            value.</p>
+        <dl class="row">
+            <dt class="col-sm-3"><code>min</code></dt>
+            <dd class="col-sm-9">The minimum number the user can set the slider's value to.</dd>
+            <dt class="col-sm-3"><code>max</code></dt>
+            <dd class="col-sm-9">The maximum number the user can set the slider's value to.</dd>
+            <dt class="col-sm-3"><code>value</code></dt>
+            <dd class="col-sm-9">The default value of the slider, will be constrained to the <code>min</code>
+                and <code>max</code> values provided.</dd>
+        </dl>
+        <p>Besides the obvious way to change the slider's value by dragging the thumb, the user can also use
+            various keyboard controls to change the value while the slider is in focus.</p>
+        <table class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Key</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><kbd>&larr;</kbd> or <kbd>-</kbd></td>
+                    <td>Decrements the value by <code>1</code> or <code>0.1</code> based on the range of the
+                        value.</td>
+                </tr>
+                <tr>
+                    <td><kbd>&rarr;</kbd> or <kbd>+</kbd></td>
+                    <td>Increments the value by <code>1</code> or <code>0.1</code> based on the range of the
+                        value.</td>
+                </tr>
+                <tr>
+                    <td><kbd>0</kbd> - <kbd>9</kbd></td>
+                    <td>Sets the value to a certain percentage of the range. For example, <kbd>2</kbd> will set
+                        the value to 20% of the range.</td>
+
+                </tr>
+                <tr>
+                    <td><kbd>
+                            <</kbd> or <kbd>[
+                        </kbd></td>
+                    <td>Sets the value to the minimum value</td>
+                </tr>
+                <tr>
+                    <td><kbd>></kbd> or <kbd>]</kbd></td>
+                    <td>Sets the value to the maximum value</td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <h4 id="checkbox">Checkbox</h4>
+        <p>...</p>
+        <br>
+        <h4 id="radio-button">Radio button</h4>
+        <p>...</p>
+    </div>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Work in progress...</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Just a warning that the documentation is still under development and the majority of elements
+                        haven't been covered yet.</p>
+                    <p>I plan to add more content soon, but until then, feel free to look over the page and provide any
+                        feedback you might have at the <a target="_blank" href="https://www.khanacademy.org/computer-programming/simple-elements/5201788906799104">original
+                            program</a> on Khan Academy.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Gotcha</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js"></script>
+    <script>
+        $(window).on('load', function () {
+            $('#exampleModal').modal('show')
+        });
+    </script>
+</body>
+<footer class="page-footer font-small blue">
+    <div class="footer-copyright text-center py-3" style="background:#007bff;color:#fff;">&copy; 2018
+        <a style="color:#fff" target="_blank" href="https://www.khanacademy.org/profile/IIZgITZIgIg/projects/"> Aliquis</a>
+    </div>
+</footer>
+
+</html>
