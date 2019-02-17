@@ -22,4 +22,4 @@ Simple GUI elements for Khan Academy. This GUI library was made to be simple and
 - MacOS Mojave and Material Design
 
 ## Documentation
-You can view the documentation [here](https://bhavjitchauhan.github.io/Simple-Elements/)
+You can view the documentation [here](https://github.com/bhavjitChauhan/Simple-Elements/wiki)
