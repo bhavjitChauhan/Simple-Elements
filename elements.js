@@ -1,9 +1,11 @@
 // jshint ignore: start
 
 // Config {
-const GUI_CONFIG = {
+const DEFAULTS = {
     strokeWeight: 0,
     roundedCorners: 5,
+    shapes: [rect, ellipse],
+    // Default shape if not defined in element
     shape: rect,
     // Holds function that return colors calculated off of the accent color
     colors: {
@@ -81,7 +83,7 @@ const GUI_CONFIG = {
  * These functions will not overwrite the default behaviour.
  * 
  * @param  flags            {object}    -   Custom flags
- * @param  defaults         {object}    -   Custom defaults for element properties
+ * @param  defaults         {object}    -   Custom default values for element properties
  * @param  type             {string}    -   Element type
  * @param  init             {function}  -   Initialization function
  * @param  draw             {function}  -   Draw function
@@ -100,20 +102,21 @@ const Element = function(options, element) {
     // Element object {
     if (element.flags) {
         let flags = element.flags;
-        let flagTypes = Object.keys(GUI_CONFIG.flags);
+        let flagTypes = Object.keys(DEFAULTS.flags);
         flagTypes.forEach(function(type) {
-            if (typeof flags[type] == 'undefined') flags[type] = GUI_CONFIG.flags[type];
+            if (typeof flags[type] == 'undefined') flags[type] = DEFAULTS.flags[type];
         });
         this.flags = flags;
     } else {
-        this.flags = GUI_CONFIG.flags;   
+        this.flags = DEFAULTS.flags;   
     }
+    // Set element default options if not defined in options obeject
     if (element.defaults) {
         Object.keys(element.defaults).forEach(function(key) {
-            options[key] = options[key] || element.defaults[key];
+            // Fallback to element defaults and then global defaults object
+            options[key] = options[key] || element.defaults[key] || DEFAULTS[key];
         });
     }
-    // Used for debugging purposes
     element.type = element.type || 'Unknown';
     // All methods of a base element
     let methods = ['init', 'draw', 'onfocus', 'onunfocus', 'onmouseover', 'onmouseout', 'onmousepress', 'onmousedrag', 'onmouserelease', 
@@ -126,12 +129,12 @@ const Element = function(options, element) {
     this.element = element;
     
     // Fallbacks to `element` object because user does not need to change animations directly
-    let animations = element.animations || GUI_CONFIG.animations;
-    let animationStep = !this.flags.ANIMATIONS ? 1 : GUI_CONFIG.animationStep;
-    let animationTypes = Object.keys(GUI_CONFIG.animations);
+    let animations = element.animations || DEFAULTS.animations;
+    let animationStep = !this.flags.ANIMATIONS ? 1 : DEFAULTS.animationStep;
+    let animationTypes = Object.keys(DEFAULTS.animations);
     animationTypes.forEach(function(type) {
         // Fallback to default animation
-        let animation = animations[type] || GUI_CONFIG.animations[type];
+        let animation = animations[type] || DEFAULTS.animations[type];
         // Define animation function
         animations[type] = function() {
             // To be used in animation, ranges from 0 to 1 to make use of `lerp` easier
@@ -150,15 +153,18 @@ const Element = function(options, element) {
     });
     this.animations = animations;
     this.activeAnimations = [];
+    // Default to all possible shape types in defaults object
+    element.shapes = element.shapes || DEFAULTS.shapes;
+    // Set shape to optional shape if it is included in possible element shapes
+    this.shape = (element.shapes.includes(options.shape) && options.shape) || DEFAULTS.shape;
     // }
     // Options object {
     this.label = options.label || element.type;
-    this.shape = element.shape || options.shape || GUI_CONFIG.shape;
     /* These fallbacks are in place in case the user wants to create a square or circle (which don't need a width and height. This is set before `x` and `y` since those values use `w` and `h` to calculate their values. 
     
-    Fallback lastly to element object in case element has default width or height */
-    options.w = options.w || options.h || element.w;
-    options.h = options.h || options.w || element.h;
+    Values should already have fell back to element in defaults check */
+    options.w = options.w || options.h;
+    options.h = options.h || options.w;
     /* Since `x` can be zero we can't simply check for `x`. Although this could be rewritten as `typeof options.x == 'number'` it was not done since we do not check if the value of an option is a number for any other parameter. Therefore, to retain uniformity, it is not done here either */
     this.x = typeof options.x != 'undefined' ? options.x :
              options.x2 - options.w / 2 ||
@@ -199,18 +205,18 @@ const Element = function(options, element) {
     // Object that stores colors
     let colors = options.colors || {};
     // Different types of colors
-    let colorTypes = Object.keys(GUI_CONFIG.colors);
+    let colorTypes = Object.keys(DEFAULTS.colors);
     // Set methods to defaults in configuration object if they aren't defined
     colorTypes.forEach(function(type) {
         // Fallback to config functions that will calculate color based off accent color
-        colors[type] = colors[type] || GUI_CONFIG.colors[type](colors.accent); 
+        colors[type] = colors[type] || DEFAULTS.colors[type](colors.accent); 
     });
     /* Set `colors` attribute to the `colors` variable we have been modifying. This is just for convinience as code in the `forEach` function is not in the `Element` scope. */
     this.colors = colors;
     this.fill = this.colors.accent;
     // For animating later on
     this.stroke = this.fill;
-    this.strokeWeight = options.strokeWeight || GUI_CONFIG.strokeWeight;
+    this.strokeWeight = options.strokeWeight || DEFAULTS.strokeWeight;
     
     // Call custom initialization function with `this`
     this.element.init.call(this);
@@ -220,12 +226,15 @@ Element.prototype = {
     draw: function() {
         pushMatrix();
         pushStyle();
-        textFont(GUI_CONFIG.font, GUI_CONFIG.fontSize);
+        textFont(DEFAULTS.font, DEFAULTS.fontSize);
         rectMode(CORNER);
         ellipseMode(CORNER);
         strokeWeight(this.strokeWeight);
         stroke(this.stroke);
-        /* Animations are drawn after `stroke` and `fill` functions in case they do not declare them. */
+        // Call `noStroke()` if stroke weight is 0 to avoid thin stroke
+        this.strokeWeight == 0 && noStroke();
+        fill(this.fill);
+        /* Animations are drawn after `stroke` and `fill` functions in case they do not declare them. Seems to be a better option than a random color from previous drawing leaking through. */
         for (let i = this.activeAnimations.length; i--;){
             // Check if animation is complete
             if (this.activeAnimations[i].call(this)){
@@ -233,9 +242,6 @@ Element.prototype = {
                 this.activeAnimations.splice(i, 1);
             }
         }
-        // Call `noStroke()` if stroke weight is 0 to avoid thin stroke
-        this.strokeWeight == 0 && noStroke();
-        fill(this.fill);
         // Call custom draw code with `this`
         this.element.draw.call(this);
         // Only call `onmouseover` event once by checking if hovered attribute is false
@@ -255,6 +261,7 @@ Element.prototype = {
         if (Mouse.released) this.onmouserelease();
         if (Key.pressed) this.onkeypress();
         if (Key.released) this.onkeyrelease();
+        // Pop after event handling in case event handling contains color changes
         popMatrix();
         popStyle();
     },
@@ -271,12 +278,14 @@ Element.prototype = {
         this.focused = true;
         // Call custom callback with `this`
         this.element.onfocus.call(this);
+        // Display focus animation
         this.activeAnimations.push(this.animations.onfocus());
     },
     onunfocus: function() {
         this.focused = false;
         // Call custom callback with `this`
         this.element.onunfocus.call(this);
+        // Display unfocus animation
         this.activeAnimations.push(this.animations.onunfocus());
     },
     onmouseover: function() {
@@ -284,6 +293,7 @@ Element.prototype = {
         this.flags.CURSOR_CHANGE && cursor('POINTER');
         // Call custom callback with `this`
         this.element.onmouseover.call(this);
+        // Display mouse over animation
         this.activeAnimations.push(this.animations.onmouseover());
     },
     onmouseout: function() {
@@ -291,6 +301,7 @@ Element.prototype = {
         this.flags.CURSOR_CHANGE && cursor('DEFAULT');
         // Call custom callback with `this`
         this.element.onmouseout.call(this);
+        // Display mouse out animation
         this.activeAnimations.push(this.animations.onmouseout());
     },
     onmousepress: function() {
@@ -298,6 +309,7 @@ Element.prototype = {
             this.active = true;
             // Call custom callback with `this`
             this.element.onmousepress.call(this);
+            // Display mouse press animation
             this.activeAnimations.push(this.animations.onmousepress());
         } else {
             // Focus is lost when mouse is anywhere but on element
@@ -315,6 +327,7 @@ Element.prototype = {
             this.onfocus();
             // Call custom callback with `this`
             this.element.onmouserelease.call(this);
+            // Display mouse release animation
             this.activeAnimations.push(this.animations.onmouserelease());
             // Display mouse over animation after mouse release
             this.mouseOver() && this.onmouseover();
@@ -326,7 +339,7 @@ Element.prototype = {
         if (this.focused) {
             if (Key.code == ENTER) {
                 this.active = true;
-                // Reutilizing `onmousepress` animation
+                // Reutilizing mouse press animation
                 this.activeAnimations.push(this.animations.onmousepress());
             }
             // Call custom callback with `this`
@@ -338,7 +351,7 @@ Element.prototype = {
             if (Key.code == ENTER) {
                 this.callback();
                 this.active = false;
-                // Reutilizing `onmouserelease` animation
+                // Reutilizing mouse release animation
                 this.activeAnimations.push(this.animations.onmouserelease());
             };
             // Call custom callback with `this`
@@ -352,7 +365,7 @@ const Button = function(options) {
     Element.call(this, options, {
         type: 'Button',
         draw: function() {
-            (this.shape)(this.x, this.y, this.w, this.h, GUI_CONFIG.roundedCorners);
+            (this.shape)(this.x, this.y, this.w, this.h, DEFAULTS.roundedCorners);
             fill(255);
             textAlign(CENTER, CENTER);
             text(this.label, this.x2, this.y2);
@@ -388,7 +401,7 @@ const __requirements__ = {
 let importer_context;
 if (importer_context) {
     let exports = {
-        'GUI_CONFIG': GUI_CONFIG,
+        'DEFAULTS': DEFAULTS,
         'Element': Element,
         'Button': Button
     };
@@ -406,6 +419,8 @@ else {
                 Program.restart();   
             }
             var b = new Button({
+                // shape: ellipse,
+                w: 100,
                 x: 25,
                 y: 25,
                 callback: function() {
