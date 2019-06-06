@@ -7,9 +7,9 @@ const DEFAULTS = {
     shapes: [rect, ellipse],
     // Default shape if not defined in element
     shape: rect,
-    // Holds function that return colors calculated off of the accent color
+    // Holds function that return colors calculated off of the primary color
     colors: {
-        accent: function() { return color(0, 111, 222); },
+        primary: function() { return color(0, 111, 222); },
         onfocus: function(_color) {
             return lerpColor(_color, color(255), 0.4);
         },
@@ -20,10 +20,12 @@ const DEFAULTS = {
         // Color to be used when mouse is pressed on element
         onmousepress: function(_color) {
             return lerpColor(_color, color(0), 0.2);
+        },
+        text: function(_color) {
+        	return lightOrDarkText(_color);
         }
     },
-    font: createFont('Segoe UI'),
-    fontSize: 15,
+    font: createFont('Segoe UI', 16),
     // Amount to increase transition by per frame
     animationStep: 0.25,
     // Object containing functions that take transition argument that is updated by element
@@ -32,24 +34,24 @@ const DEFAULTS = {
             this.strokeWeight = lerp(this.strokeWeight, 3, transition);
             this.stroke = this.colors.onfocus;
         },
-        onunfocus: function(transition) {
+        onblur: function(transition) {
             this.strokeWeight = lerp(this.strokeWeight, 0, transition);
             this.stroke = this.colors.onfocus;
         },
         onmouseover: function(transition) {
-            this.fill = lerpColor(this.colors.accent, this.colors.onmouseover, 
+            this.fill = lerpColor(this.colors.primary, this.colors.onmouseover, 
                 transition);
         },
         onmouseout: function(transition) {
-            this.fill = lerpColor(this.colors.onmouseover, this.colors.accent,
+            this.fill = lerpColor(this.colors.onmouseover, this.colors.primary,
                 transition);
         },
         onmousepress: function(transition) {
-            this.fill = lerpColor(this.colors.accent, this.colors.onmousepress, 
+            this.fill = lerpColor(this.colors.primary, this.colors.onmousepress, 
                 transition);
         },
         onmouserelease: function(transition) {
-            this.fill = lerpColor(this.colors.onmousepress, this.colors.accent,
+            this.fill = lerpColor(this.colors.onmousepress, this.colors.primary,
                 transition);
         }
     },
@@ -83,12 +85,12 @@ const DEFAULTS = {
  * These functions will not overwrite the default behaviour.
  * 
  * @param  flags            {object}    -   Custom flags
- * @param  defaults         {object}    -   Custom default values for element properties
+ * @param  defaults         {object}    -   Custom default values for options
  * @param  type             {string}    -   Element type
  * @param  init             {function}  -   Initialization function
  * @param  draw             {function}  -   Draw function
  * @param  onfocus          {function}  -   Custom callback for focus event
- * @param  onunfocus        {function}  -   Custom callback for unfocus event
+ * @param  onblur        {function}  -   Custom callback for blur event
  * @param  onmouseover      {function}  -   Custom callback for mouse over event
  * @param  onmouseout       {function}  -   Cusotm callback for mouse out event
  * @param  onmousepress     {function}  -   Custom callback for mouse press event
@@ -118,8 +120,9 @@ const Element = function(options, element) {
         });
     }
     element.type = element.type || 'Unknown';
+    element.id = _.uniqueId(element.type);
     // All methods of a base element
-    let methods = ['init', 'draw', 'onfocus', 'onunfocus', 'onmouseover', 'onmouseout', 'onmousepress', 'onmousedrag', 'onmouserelease', 
+    let methods = ['init', 'draw', 'onfocus', 'onblur', 'onmouseover', 'onmouseout', 'onmousepress', 'onmousedrag', 'onmouserelease', 
         'onkeypress', 'onkeyrelease'];
     // Set methods to `noop` if they aren't defined
     methods.forEach(function(method) {
@@ -128,8 +131,17 @@ const Element = function(options, element) {
     /* Set `element` attribute to the `element` argument we have been modifying. This is just for convinience as code in the `forEach` function is not in the `Element` scope. */
     this.element = element;
     
-    // Fallbacks to `element` object because user does not need to change animations directly
-    let animations = element.animations || DEFAULTS.animations;
+    // Event handling
+	Mouse.on('mousepress', this.onmousepress, this);
+	Mouse.on('mousedrag', this.onmousedrag, this);
+	Mouse.on('mouserelease', this.onmouserelease, this);
+	Key.on('keypress', this.onkeypress, this);
+	Key.on('keyrelease', this.onkeyrelease, this);
+    
+    /* `element` object is used because user does not need to change animations directly when creating new element instances.
+    
+    Doesn't fallback to `DEFAULTS.animations` itself because that causes a bug (see https://github.com/bhavjitChauhan/Simple-Elements/issues/2) where animations are not displayed. Instead falls back to a clone of default animations if animations object doesn't exist in element object. */
+    let animations = element.animations || Object.assign({}, DEFAULTS.animations);
     let animationStep = !this.flags.ANIMATIONS ? 1 : DEFAULTS.animationStep;
     let animationTypes = Object.keys(DEFAULTS.animations);
     animationTypes.forEach(function(type) {
@@ -182,6 +194,9 @@ const Element = function(options, element) {
     this.h = options.h  ||
              (options.y2 - this.y) * 2 ||
              (options.y3 - this.y);
+             
+    // this.w = max(this.w, textWidth(this.label));
+    
     // Ellipses aren't supported so width overwrites height's value if shape is ellipse
     this.shape == ellipse && (this.h = this.w);
     
@@ -208,16 +223,16 @@ const Element = function(options, element) {
     let colorTypes = Object.keys(DEFAULTS.colors);
     // Set methods to defaults in configuration object if they aren't defined
     colorTypes.forEach(function(type) {
-        // Fallback to config functions that will calculate color based off accent color
-        colors[type] = colors[type] || DEFAULTS.colors[type](colors.accent); 
+        // Fallback to config functions that will calculate color based off primary color
+        colors[type] = colors[type] || DEFAULTS.colors[type](colors.primary); 
     });
     /* Set `colors` attribute to the `colors` variable we have been modifying. This is just for convinience as code in the `forEach` function is not in the `Element` scope. */
     this.colors = colors;
-    this.fill = this.colors.accent;
+    this.fill = this.colors.primary;
     // For animating later on
     this.stroke = this.fill;
     this.strokeWeight = options.strokeWeight || DEFAULTS.strokeWeight;
-    
+	
     // Call custom initialization function with `this`
     this.element.init.call(this);
     // }
@@ -226,7 +241,7 @@ Element.prototype = {
     draw: function() {
         pushMatrix();
         pushStyle();
-        textFont(DEFAULTS.font, DEFAULTS.fontSize);
+        textFont(DEFAULTS.font);
         rectMode(CORNER);
         ellipseMode(CORNER);
         strokeWeight(this.strokeWeight);
@@ -255,12 +270,6 @@ Element.prototype = {
             // Set attribute to false to prevent calling event multiple times
             this.hovered = false;
         }
-        // Mouse and Key event checks
-        if (Mouse.pressed) this.onmousepress();
-        if (Mouse.dragged) this.onmousedrag();
-        if (Mouse.released) this.onmouserelease();
-        if (Key.pressed) this.onkeypress();
-        if (Key.released) this.onkeyrelease();
         // Pop after event handling in case event handling contains color changes
         popMatrix();
         popStyle();
@@ -281,12 +290,12 @@ Element.prototype = {
         // Display focus animation
         this.activeAnimations.push(this.animations.onfocus());
     },
-    onunfocus: function() {
+    onblur: function() {
         this.focused = false;
         // Call custom callback with `this`
-        this.element.onunfocus.call(this);
-        // Display unfocus animation
-        this.activeAnimations.push(this.animations.onunfocus());
+        this.element.onblur.call(this);
+        // Display blur animation
+        this.activeAnimations.push(this.animations.onblur());
     },
     onmouseover: function() {
         // Only change cursor if `CURSOR_CHANGE` flag is true
@@ -313,7 +322,7 @@ Element.prototype = {
             this.activeAnimations.push(this.animations.onmousepress());
         } else {
             // Focus is lost when mouse is anywhere but on element
-            this.onunfocus();
+            this.onblur();
         }
     },
     onmousedrag: function() {
@@ -366,20 +375,23 @@ const Button = function(options) {
         type: 'Button',
         draw: function() {
             (this.shape)(this.x, this.y, this.w, this.h, DEFAULTS.roundedCorners);
-            fill(255);
+            fill(this.colors.text);
             textAlign(CENTER, CENTER);
             text(this.label, this.x2, this.y2);
         },
         defaults: {
             w: 75,
-            h: 30
+            h: 40
         }
     });  
 };
 Button.prototype = Object.create(Element.prototype);
 // }
 // Exporting {
-const bootstrapper = function(callback) {
+
+/* Using the cached bootstrapper when testing will save time but duplicated Backbone.js events causing elements to trigger callbacks multiple times */
+// let __bmslib__;
+const bootstrapper = /* __bmslib__ ? __bmslib__.cached_bootstrapper : */ function(callback) {
     let doc = Object.constructor('return this.document')();
     let jsonp = doc[['createElement']]('script');
     doc.BMS_bootstrap_loader = function(data) {
@@ -394,7 +406,7 @@ const bootstrapper = function(callback) {
     doc.head.appendChild(jsonp);
 };
 const __requirements__ = {
-    'core': 'library',
+    'Essentials': 'library',
 };
 
 // Check if program is being imported or running by itself
@@ -415,23 +427,29 @@ if (importer_context) {
 else {
     bootstrapper({
         done: function(BMS, modules) {
-            if (typeof IMPORTED_CORE == 'undefined') {
+            if (typeof IMPORTED_ESSENTIALS == 'undefined') {
                 Program.restart();   
             }
             var b = new Button({
-                // shape: ellipse,
-                w: 100,
                 x: 25,
                 y: 25,
+                w: 100,
                 callback: function() {
                     println('Callback!');
                 }
             });
+            // Element animations do not work with more than one element created
+            var b2 = new Button({
+                shape: ellipse,
+                label: 'New',
+                x: 150,
+                y: 25,
+                w: 50
+            });
             draw = function() {
                 background(255);
                 b.draw();
-                Mouse.update();
-                Key.update();
+                b2.draw();
             };
         },
         progress: function(progress) {
@@ -439,7 +457,7 @@ else {
             fill(0);
             textAlign(CENTER);
             textFont(createFont('monospace'), 15);
-            text('Importing core library...', width / 2, height / 2);
+            text('Importing Essentials library...', width / 2, height / 2);
         }
     });
 }
