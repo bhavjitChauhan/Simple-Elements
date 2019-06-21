@@ -2,7 +2,7 @@
 Simple GUI elements for Khan Academy. This GUI library was made to be simple and easy to use. It doesn’t offer a huge selection of elements as of now, but the number will increase in the future. You can view the program on Khan Academy [here](https://www.khanacademy.org/computer-programming/ps-elements/4892508239003648).
 
 ## Built With
- - [Project Samaritan Core Library](https://github.com/bhavjitChauhan/Project-Samaritan/blob/master/core-library.js) - Event handling
+ - [Essentials Library](https://github.com/bhavjitChauhan/Essentials) - Event handling
  - [Ben's Module System](https://www.khanacademy.org/cs/i/6070976254115840) - Module import/export system
 
 ## Acknowledgements
